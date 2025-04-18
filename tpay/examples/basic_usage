@@ -1,0 +1,39 @@
+"""
+Basic usage example of TPay SDK
+"""
+import os
+from dotenv import load_dotenv
+from tpay import tpay_initialize, TPayAgent
+
+# Load environment variables
+load_dotenv()
+
+# Initialize TPay
+tpay_initialize(
+    api_key=os.getenv("TLEDGER_API_KEY"),
+    api_secret=os.getenv("TLEDGER_API_SECRET")
+)
+
+# Create TPayAgent instance
+agent = TPayAgent()
+
+# Create a payment
+payment = agent.create_payment(
+    receiving_agent_id="recipient123",
+    payment_amount=100.0,
+    currency="USDT",
+    settlement_network="solana"
+)
+
+print(f"Payment created: {payment['id']}")
+
+# Check payment status
+status = agent.get_payment_status(payment["id"])
+print(f"Payment status: {status['status']}")
+
+# Wait for payment success
+try:
+    success = agent.wait_for_payment_success(payment["id"], timeout=60)
+    print(f"Payment {'succeeded' if success else 'failed'}")
+except Exception as e:
+    print(f"Error waiting for payment: {e}")
