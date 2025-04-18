@@ -112,9 +112,6 @@ payment_tool = create_payment_tool()
 
 # Create balance tool
 balance_tool = create_balance_tool()
-
-# Add tool defintions to the tool list
-tools.extend(get_all_tool_definitions())
 ```
 
 2. **Add Tools to Your Agent**
@@ -124,6 +121,12 @@ Simply add the tools to your existing agent's tool list:
 ```python
 # Example with OpenAI's client
 from openai import OpenAI
+
+# Initialize your own tool list for your agent
+tools = [...]
+
+# Then add our tool defintions to the tool list
+tools.extend(get_all_tool_definitions())
 
 client = OpenAI(
     api_key="your_openai_api_key",
