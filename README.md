@@ -113,41 +113,8 @@ payment_tool = create_payment_tool()
 # Create balance tool
 balance_tool = create_balance_tool()
 
-# Define tools for your agent
-tools = [
-    {
-        "type": "function",
-        "function": {
-            "name": "create_payment",
-            "description": "Create a payment transaction between agents",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "agent_id": {"type": "string"},
-                    "amount": {"type": "number"},
-                    "recipient_agent_id": {"type": "string"},
-                    "currency": {"type": "string", "default": "USDT"},
-                    "settlement_network": {"type": "string", "default": "solana"}
-                },
-                "required": ["agent_id", "amount", "recipient_agent_id"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "get_agent_balance",
-            "description": "Query agent's account balance",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "agent_id": {"type": "string"}
-                },
-                "required": ["agent_id"]
-            }
-        }
-    }
-]
+# Add tool defintions to the tool list
+tools.append(get_all_tool_definitions())
 ```
 
 2. **Add Tools to Your Agent**
@@ -161,7 +128,7 @@ from openai import OpenAI
 client = OpenAI(
     api_key="your_openai_api_key",
     model="gpt-4-turbo-preview",
-    tools=tools,  # Add our tools to your existing tools
+    tools=tools,  # Make sure you have added our tools to your existing tools
     tool_choice="auto"
 )
 ```
@@ -222,7 +189,3 @@ except TPayError as e:
 ## Contributing
 
 We welcome contributions! Please see our contributing guidelines for more information.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details. 

@@ -6,7 +6,7 @@ import hashlib
 import json
 import re
 import uuid
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 @staticmethod
 def normalize_code(code: str) -> str:
@@ -68,3 +68,63 @@ def parse_trace_context(trace_context_str: str) -> Dict[str, Any]:
         Trace context dictionary
     """
     return json.loads(trace_context_str)
+
+def get_payment_tool_definition() -> Dict[str, Any]:
+    """
+    Returns the standardized payment tool definition
+    
+    Returns:
+        A dictionary containing the payment tool definition
+    """
+    return {
+        "type": "function",
+        "function": {
+            "name": "create_payment",
+            "description": "Create a payment transaction between agents",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "agent_id": {"type": "string"},
+                    "amount": {"type": "number"},
+                    "receiving_agent_id": {"type": "string"},
+                    "currency": {"type": "string", "default": "USDT"},
+                    "settlement_network": {"type": "string", "default": "solana"}
+                },
+                "required": ["agent_id", "amount", "recipient_agent_id"]
+            }
+        }
+    }
+
+def get_balance_tool_definition() -> Dict[str, Any]:
+    """
+    Returns the standardized balance query tool definition
+    
+    Returns:
+        A dictionary containing the balance tool definition
+    """
+    return {
+        "type": "function",
+        "function": {
+            "name": "get_agent_balance",
+            "description": "Query agent's account balance",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "agent_id": {"type": "string"}
+                },
+                "required": ["agent_id"]
+            }
+        }
+    }
+
+def get_all_tool_definitions() -> List[Dict[str, Any]]:
+    """
+    Returns all available tool definitions
+    
+    Returns:
+        A list of dictionaries containing all tool definitions
+    """
+    return [
+        get_payment_tool_definition(),
+        get_balance_tool_definition()
+    ]
