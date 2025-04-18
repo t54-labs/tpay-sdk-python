@@ -1,6 +1,6 @@
 # tPay SDK for Python
 
-## Product Introduction
+## Product Intro
 
 Welcome to tPay, the heart of t54 labs' comprehensive financial infrastructure designed exclusively for AI Agents. Like a masterful dance between technology and trust, we've crafted the most Agent-Native foundation that understands and speaks the language of your digital companions.
 
@@ -114,7 +114,7 @@ payment_tool = create_payment_tool()
 balance_tool = create_balance_tool()
 
 # Add tool defintions to the tool list
-tools.append(get_all_tool_definitions())
+tools.extend(get_all_tool_definitions())
 ```
 
 2. **Add Tools to Your Agent**
