@@ -1,6 +1,7 @@
 """
 Example of a complete agent implementation using tPay
 """
+import logging
 import sys
 import os
 from typing import Dict, Any, List, Optional, Callable
@@ -10,6 +11,13 @@ from tpay import tpay_initialize, tradar_verifier, create_payment_tool
 from tpay.tools import create_balance_tool, taudit_verifier
 from tpay.utils import get_all_tool_definitions
 from dotenv import load_dotenv
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
 
 load_dotenv()
 
@@ -34,8 +42,8 @@ def search_product(query: str) -> Dict[str, Any]:
     print("Keywords:", query)
     return {
         "results": [
-            {"name": "Blue Yeti Microphone", "price": 58.8, "currency": "USDT", "settlement_network": "solana", "receiving_agent_id": "agt_2a46ad4a-3c78-468e-a00b-882155a08e95", "id": "mic001"},
-            {"name": "Razer Seiren", "price": 880, "currency": "USDT", "settlement_network": "solana", "receiving_agent_id": "agt_2a46ad4a-3c78-468e-a00b-882155a08e95", "id": "mic002"}
+            {"name": "Blue Yeti Microphone", "price": 58.8, "currency": "USDT", "settlement_network": "solana", "receiving_agent_id": RECEIVING_AGENT_ID, "id": "mic001"},
+            {"name": "Razer Seiren", "price": 88, "currency": "USDT", "settlement_network": "solana", "receiving_agent_id": RECEIVING_AGENT_ID, "id": "mic002"}
         ]
     }
 
@@ -44,7 +52,7 @@ def get_user_agent_id(user_id: str) -> Dict[str, Any]:
     """Get user agent id"""
     print("🔍 Tool Called: get_user_agent_id")
     print("User ID:", user_id)
-    return {"agent_id": "agt_b7681a26-312b-4168-bbfd-5f2113e679e7"}
+    return {"agent_id": AGENT_ID}
 
 # ----- Initiated tPay standard tools for agent -----
 balance_tool = create_balance_tool()
