@@ -17,16 +17,16 @@ logger = logging.getLogger(__name__)
 
 if not logger.handlers:
     console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.DEBUG)
+    console_handler.setLevel(logging.WARNING)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.WARNING)
     
     root_logger = logging.getLogger()
     if not root_logger.handlers:
         root_logger.addHandler(console_handler)
-        root_logger.setLevel(logging.DEBUG)
+        root_logger.setLevel(logging.WARNING)
 
 # global configuration
 _config = {

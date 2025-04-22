@@ -32,6 +32,3 @@ def wrap_openai_client(client: Optional[OpenAI] = None) -> None:
 
     # ✅ Replace the method of the Completions class itself, not an instance
     Completions.create = wrapped_create
-
-    
-    print("✅ OpenAI client wrapped successfully")

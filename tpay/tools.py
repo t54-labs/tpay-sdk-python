@@ -80,7 +80,6 @@ def taudit_verifier(func: Callable) -> Callable:
         # Register the function for auditing
         AUDITED_ENTITIES.append((func, metadata))
         AUDIT_SNAPSHOT[func_id] = metadata
-        logger.debug(f"Function {func.__name__} registered for auditing with hash {code_hash[:8]}")
 
     except Exception as e:
         logger.error(f"Unable to get metadata for function {func.__name__}: {e}")
@@ -150,14 +149,10 @@ def submit_audit(project_id: str = "default") -> Dict[str, Any]:
     
     # Submit to backend
     try:
-        logger.info(f"Submitting audit for project {project_id} with {len(functions)} functions")
         response = make_request("POST", "/radar/audit", data=audit_request.model_dump())
-        logger.info(f"Audit submitted successfully: {response}")
         return response
     except Exception as e:
-        logger.error(f"Failed to submit audit: {str(e)}")
-        # throw error trace stack
-        traceback.print_exc()
+        logger.error(f"Failed to finish taudit: {str(e)}")
         return {"status": "error", "message": f"Failed to submit audit: {str(e)}"}
 
 
@@ -191,9 +186,7 @@ def tradar_verifier(func: Callable) -> Callable:
         # Set current tool call (maintain backward compatibility)
         trace_store.set("tool_invoked", func_name)
         trace_store.set("tool_args", {"args": args, "kwargs": kwargs})
-        
-        logger.info(f"Tool invoked: {func_name} with args: {kwargs}")
-        
+                
         # Call original function
         return func(*args, **kwargs)
          
@@ -234,7 +227,6 @@ class PaymentTool:
         # Get current tool call and arguments
         trace_context = trace_store.get_all()
         logger.info(f"Creating payment from {agent_id} to {receiving_agent_id} with amount {amount} {currency} on {settlement_network}")
-        logger.debug(f"Trace context: {trace_context}")
 
         func_stack_hashes = get_current_stack_function_hashes()
 

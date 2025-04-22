@@ -80,7 +80,7 @@ def get_payment_tool_definition() -> Dict[str, Any]:
         "type": "function",
         "function": {
             "name": "create_payment",
-            "description": "Create a payment transaction between agents",
+            "description": "Create a payment transaction between agents. If transaction is not approved, there may be a chance you will be receiving a specific challenge request from the payment validator and you will be able to provide additional information in your reasoning process and resubmit the transaction. The challenge will be expired when the conversation is closed.",
             "parameters": {
                 "type": "object",
                 "properties": {
