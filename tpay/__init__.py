@@ -5,7 +5,7 @@ TPay SDK for Python
 from .agent import TPayAgent
 from .core import tpay_initialize, make_request
 from .exceptions import TPayError
-from .tools import create_payment_tool, create_balance_tool, PaymentTool, BalanceTool, tradar_verifier, taudit_verifier
+from .tools import tpay_toolkit_payment, tpay_toolkit_balance, PaymentTool, BalanceTool, tradar_verifier, taudit_verifier
 from .utils import (
     normalize_code, 
     generate_code_hash, 
@@ -24,8 +24,8 @@ __all__ = [
     "tpay_initialize",
     "make_request",
     "TPayError",
-    "create_payment_tool",
-    "create_balance_tool",
+    "tpay_toolkit_payment",
+    "tpay_toolkit_balance",
     "PaymentTool",
     "BalanceTool",
     "normalize_code",

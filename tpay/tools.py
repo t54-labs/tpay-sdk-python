@@ -209,7 +209,8 @@ class PaymentTool:
         receiving_agent_id: str,
         amount: float,
         currency: str = "USDT",
-        settlement_network: str = "solana"
+        settlement_network: str = "solana",
+        debug_mode: bool = False
     ) -> Dict[str, Any]:
         """
         Create a payment
@@ -220,6 +221,7 @@ class PaymentTool:
             payment_amount: Payment amount
             currency: Payment currency (default: USDT)
             settlement_network: Settlement network (default: solana)
+            debug_mode: Debug mode for testing
             
         Returns:
             Payment information
@@ -238,7 +240,8 @@ class PaymentTool:
             currency=currency,
             settlement_network=settlement_network,
             trace_context=trace_context,
-            func_stack_hashes=func_stack_hashes
+            func_stack_hashes=func_stack_hashes,
+            debug_mode=debug_mode
         )
 
 
@@ -268,7 +271,7 @@ class BalanceTool:
         return self.agent.get_agent_balance(agent_id)
 
 
-def create_payment_tool() -> PaymentTool:
+def tpay_toolkit_payment() -> PaymentTool:
     """
     Create a payment tool instance
     
@@ -278,7 +281,7 @@ def create_payment_tool() -> PaymentTool:
     return PaymentTool()
 
 
-def create_balance_tool() -> BalanceTool:
+def tpay_toolkit_balance() -> BalanceTool:
     """
     Create a balance tool instance
     

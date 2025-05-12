@@ -7,8 +7,8 @@ import os
 from typing import Dict, Any, List, Optional, Callable
 from openai import OpenAI
 from openai.types.chat import ChatCompletionMessage
-from tpay import tpay_initialize, tradar_verifier, create_payment_tool
-from tpay.tools import create_balance_tool, taudit_verifier
+from tpay import *
+from tpay.tools import taudit_verifier
 from tpay.utils import get_all_tool_definitions
 from dotenv import load_dotenv
 
@@ -42,7 +42,7 @@ def search_product(query: str) -> Dict[str, Any]:
     return {
         "results": [
             {"name": "Blue Yeti Microphone", "price": 109.0, "currency": "USDT", "settlement_network": "solana", "receiving_agent_id": RECEIVING_AGENT_ID, "id": "mic001"},
-            {"name": "Pro Gaming Mic Bundle (Requires Annual Pro License)", "price": 39.99, "currency": "USDT", "settlement_network": "solana", "receiving_agent_id": "agt_bed0247e-8db7-4b35-ba2e-929254be6959", "id": "mic002"}
+            # {"name": "Pro Gaming Mic Bundle (Requires Annual Pro License)", "price": 39.99, "currency": "USDT", "settlement_network": "solana", "receiving_agent_id": "agt_bed0247e-8db7-4b35-ba2e-929254be6959", "id": "mic002"}
             # {"name": "Neumann U87 Studio Microphone", "price": 0.87, "currency": "USDT", "settlement_network": "solana", "receiving_agent_id": "agt_bed0247e-8db7-4b35-ba2e-929254be6959", "id": "mic003"}
             # {"name": "Razer Seiren", "price": 88, "currency": "USDT", "settlement_network": "solana", "receiving_agent_id": RECEIVING_AGENT_ID, "id": "mic002"}
         ]
@@ -81,8 +81,8 @@ def mock_up_get_product_details(product_id: str) -> Dict[str, Any]:
 
 
 # ----- Initiated tPay standard tools for agent -----
-balance_tool = create_balance_tool()
-payment_tool = create_payment_tool()
+balance_tool = tpay_toolkit_balance()
+payment_tool = tpay_toolkit_payment()
 
 # ----- Tool definitions -----
 tools = [
@@ -217,6 +217,9 @@ def execute_tool(tool_name: str, args: Dict[str, Any]) -> Dict[str, Any]:
             args["currency"] = "USDT"
         if "settlement_network" not in args:
             args["settlement_network"] = "solana"
+        
+        # Enable debug mode for testing, payment will be offline
+        args["debug_mode"] = True
         return payment_tool(**args)
     elif tool_name == "mock_up_get_product_details":
         return mock_up_get_product_details(**args)
@@ -375,6 +378,7 @@ def main():
                 print(f"🔧 Tool Response: {msg.content}")
 
 # Initialize tpay sdk
+# remember to replace the base_url to the url shown on your tPortal
 tpay_initialize(api_key=TLEDGER_API_KEY, api_secret=TLEDGER_API_SECRET, project_id=TLEDGER_PROJECT_ID, timeout=1000)
 
 # Create OpenAI client

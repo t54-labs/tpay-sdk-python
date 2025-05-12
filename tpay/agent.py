@@ -89,7 +89,9 @@ class PaymentRequest(BaseModel):
     func_stack_hashes: str = Field(
         default="[]", description="JSON string containing the hashes of the functions in the call stack"
     )
-
+    debug_mode: bool = Field(
+        default=False, description="Debug mode for testing"
+    )
 
 class TPayAgent:
     """
@@ -110,7 +112,8 @@ class TPayAgent:
         currency: str = "USDT",
         settlement_network: str = "solana",
         trace_context: Optional[Dict[str, Any]] = None,
-        func_stack_hashes: Optional[str] = None
+        func_stack_hashes: Optional[str] = None,
+        debug_mode: bool = False
     ) -> Dict[str, Any]:
         """
         Create a payment
@@ -123,7 +126,7 @@ class TPayAgent:
             settlement_network: Settlement network (default: solana)
             trace_context: Trace context for tracking
             func_stack_hashes: JSON string containing function hashes
-            
+            debug_mode: Debug mode for testing
         Returns:
             Payment information
         """
@@ -149,9 +152,9 @@ class TPayAgent:
                 currency=currency,
                 settlement_network=settlement_network,
                 trace_context=trace_context_str,
-                func_stack_hashes=func_stack_hashes_str
+                func_stack_hashes=func_stack_hashes_str,
+                debug_mode=debug_mode
             )
-            logger.debug(f"Payment request created: {payment_request}")
         except Exception as e:
             traceback.print_exc()
             raise TPayError(f"Error creating payment request: {e}")
