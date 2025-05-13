@@ -105,13 +105,13 @@ The SDK provides seamless integration with any OpenAI-compatible agent library. 
 1. **Create Tools**
 
 ```python
-from tpay import create_payment_tool, create_balance_tool
+from tpay import *
 
 # Create payment tool
-payment_tool = create_payment_tool()
+payment_tool = tpay_toolkit_payment()
 
 # Create balance tool
-balance_tool = create_balance_tool()
+balance_tool = tpay_toolkit_balance()
 ```
 
 2. **Add Tools to Your Agent**
