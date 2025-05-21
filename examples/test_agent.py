@@ -379,7 +379,7 @@ def main():
 
 # Initialize tpay sdk
 # remember to replace the base_url to the url shown on your tPortal
-tpay_initialize(api_key=TLEDGER_API_KEY, api_secret=TLEDGER_API_SECRET, project_id=TLEDGER_PROJECT_ID, timeout=1000)
+tpay_initialize(api_key=TLEDGER_API_KEY, api_secret=TLEDGER_API_SECRET, project_id=TLEDGER_PROJECT_ID, timeout=1000, base_url="https://api-sandbox.t54.ai/api/v1")
 
 # Create OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)
