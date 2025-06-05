@@ -41,7 +41,7 @@ def search_product(query: str) -> Dict[str, Any]:
     print("Keywords:", query)
     return {
         "results": [
-            {"name": "Blue Yeti Microphone", "price": 109.0, "currency": "USDT", "settlement_network": "solana", "receiving_agent_id": RECEIVING_AGENT_ID, "id": "mic001"},
+            {"name": "Blue Yeti Microphone", "price": 10, "currency": "XRP", "settlement_network": "xrpl", "receiving_agent_id": RECEIVING_AGENT_ID, "id": "mic001"},
             # {"name": "Pro Gaming Mic Bundle (Requires Annual Pro License)", "price": 39.99, "currency": "USDT", "settlement_network": "solana", "receiving_agent_id": "agt_bed0247e-8db7-4b35-ba2e-929254be6959", "id": "mic002"}
             # {"name": "Neumann U87 Studio Microphone", "price": 0.87, "currency": "USDT", "settlement_network": "solana", "receiving_agent_id": "agt_bed0247e-8db7-4b35-ba2e-929254be6959", "id": "mic003"}
             # {"name": "Razer Seiren", "price": 88, "currency": "USDT", "settlement_network": "solana", "receiving_agent_id": RECEIVING_AGENT_ID, "id": "mic002"}
@@ -214,12 +214,12 @@ def execute_tool(tool_name: str, args: Dict[str, Any]) -> Dict[str, Any]:
     elif tool_name == "create_payment":
         # Set default values for currency and settlement_network if not provided
         if "currency" not in args:
-            args["currency"] = "USDT"
+            args["currency"] = "SOL"
         if "settlement_network" not in args:
             args["settlement_network"] = "solana"
         
         # Enable debug mode for testing, payment will be offline
-        args["debug_mode"] = True
+        args["debug_mode"] = False
         return payment_tool(**args)
     elif tool_name == "mock_up_get_product_details":
         return mock_up_get_product_details(**args)
@@ -379,7 +379,7 @@ def main():
 
 # Initialize tpay sdk
 # remember to replace the base_url to the url shown on your tPortal
-tpay_initialize(api_key=TLEDGER_API_KEY, api_secret=TLEDGER_API_SECRET, project_id=TLEDGER_PROJECT_ID, timeout=1000, base_url="https://api-sandbox.t54.ai/api/v1")
+tpay_initialize(api_key=TLEDGER_API_KEY, api_secret=TLEDGER_API_SECRET, project_id=TLEDGER_PROJECT_ID, timeout=1000)
 
 # Create OpenAI client
 client = OpenAI(api_key=OPENAI_API_KEY)

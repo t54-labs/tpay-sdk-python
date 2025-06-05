@@ -3,7 +3,7 @@ TPay SDK for Python
 """
 
 from .agent import TPayAgent
-from .core import tpay_initialize, make_request
+from .core import tpay_initialize, make_request, create_agent
 from .exceptions import TPayError
 from .tools import tpay_toolkit_payment, tpay_toolkit_balance, PaymentTool, BalanceTool, tradar_verifier, taudit_verifier
 from .utils import (
@@ -23,6 +23,7 @@ __all__ = [
     "TPayAgent",
     "tpay_initialize",
     "make_request",
+    "create_agent",
     "TPayError",
     "tpay_toolkit_payment",
     "tpay_toolkit_balance",

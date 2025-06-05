@@ -222,3 +222,56 @@ class TPayAgent:
                 )
                 
             time.sleep(check_interval)
+    
+    def create_agent(
+        self,
+        name: str,
+        description: str,
+        project_id: Optional[str] = None,
+        agent_daily_limit: float = 100.0,
+        agent_type: str = "autonomous_agent"
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Create a new agent using API key and secret authentication
+        
+        Args:
+            name: Agent name
+            description: Agent description
+            project_id: Project ID (optional, will use config default if not provided)
+            agent_daily_limit: Daily spending limit for the agent (default: 100.0)
+            agent_type: Type of agent (default: "autonomous_agent")
+            
+        Returns:
+            Dictionary containing agent information, or None if creation fails
+        """
+        from .core import make_request, get_config
+        
+        # Get project_id from config if not provided
+        if project_id is None:
+            config = get_config()
+            project_id = config.get("project_id")
+            if not project_id:
+                logger.error("Project ID not provided and not found in configuration")
+                return None
+        
+        logger.info(f"Creating agent: {name}")
+        
+        payload = {
+            "name": name,
+            "project_id": project_id,
+            "description": description,
+            "agent_daily_limit": agent_daily_limit,
+            "agent_type": agent_type
+        }
+        
+        try:
+            # Use the make_request function which handles API key/secret authentication
+            agent_data = make_request("POST", "/agent_profiles", data=payload)
+            logger.info(f"Agent creation successful: {agent_data.get('id', 'Unknown ID')}")
+            print("\n=== Agent Creation Response ===")
+            print(json.dumps(agent_data, indent=2))
+            print("="*30)
+            return agent_data
+        except Exception as e:
+            logger.error(f"Agent creation failed: {str(e)}")
+            return None
