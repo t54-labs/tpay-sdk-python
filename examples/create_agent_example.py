@@ -55,6 +55,29 @@ def create_agent_example():
         print(f"Agent name: {agent_data2['name']}")
     else:
         print("Failed to create agent")
+    
+    print("\n" + "="*50 + "\n")
+    
+    # Method 3: Get agent asset balance
+    print("=== Method 3: Get Agent Asset Balance ===")
+    
+    if agent_data:
+        agent_id = agent_data['id']
+        
+        # Using standalone function
+        print("Using standalone function:")
+        balance_data = tpay.get_agent_asset_balance(
+            agent_id=agent_id,
+            network="solana",
+            asset="USDC"
+        )
+        
+        print("\nUsing TPayAgent class:")
+        balance_data2 = agent.get_agent_asset_balance(
+            agent_id=agent_id,
+            network="solana", 
+            asset="SOL"
+        )
 
 
 if __name__ == "__main__":

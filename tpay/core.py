@@ -10,6 +10,13 @@ import traceback
 import requests
 from typing import Dict, Any, Optional, Callable, List
 from dotenv import load_dotenv
+
+# Async imports
+try:
+    import httpx
+    ASYNC_AVAILABLE = True
+except ImportError:
+    ASYNC_AVAILABLE = False
 from .exceptions import TPayAPIError, TPayConfigError
 from .trace import trace_store
 
@@ -215,4 +222,174 @@ def create_agent(
         return agent_data
     except Exception as e:
         logger.error(f"Agent creation failed: {str(e)}")
+        return None
+
+def get_agent_asset_balance(
+    agent_id: str,
+    network: str,
+    asset: str
+) -> Optional[Dict[str, Any]]:
+    """
+    Get the balance for a specific asset on a specific network for an agent
+    
+    Args:
+        agent_id: ID of the agent
+        network: Network (e.g., solana, xrpl)
+        asset: Asset type (e.g., USDC, XRP, SOL)
+        
+    Returns:
+        Dictionary containing asset balance information, or None if retrieval fails
+    """
+    logger.info(f"Getting {asset} balance on {network} for agent {agent_id}")
+    
+    endpoint = f"/balance/agent/{agent_id}/{network}/{asset}"
+    
+    try:
+        # Use the make_request function which handles API key/secret authentication
+        balance_data = make_request("GET", endpoint)
+        balance_data["balance"] = float(balance_data["balance"])
+        return balance_data["balance"]
+    except Exception as e:
+        logger.error(f"Asset balance retrieval failed: {str(e)}")
+        return None
+
+# ===============================================
+# ASYNC VERSIONS
+# ===============================================
+
+async def async_make_request(
+    method: str,
+    endpoint: str,
+    data: Optional[Dict[str, Any]] = None,
+    params: Optional[Dict[str, Any]] = None,
+    headers: Optional[Dict[str, str]] = None
+) -> Dict[str, Any]:
+    """
+    Make an async API request
+    
+    Args:
+        method: HTTP method
+        endpoint: API endpoint
+        data: Request data
+        params: Query parameters
+        headers: Request headers
+        
+    Returns:
+        API response
+        
+    Raises:
+        ImportError: If httpx is not installed
+        TPayAPIError: If API request fails
+    """
+    if not ASYNC_AVAILABLE:
+        raise ImportError("httpx is required for async functionality. Install with: pip install httpx")
+    
+    config = get_config()
+    
+    if not headers:
+        headers = {}
+    
+    headers.update({
+        "X-API-Key": config["api_key"],
+        "X-API-Secret": config["api_secret"],
+        "Content-Type": "application/json",
+    })
+    
+    url = f"{config['base_url']}/{endpoint.lstrip('/')}"
+    
+    try:
+        async with httpx.AsyncClient(timeout=config["timeout"]) as client:
+            response = await client.request(
+                method=method,
+                url=url,
+                json=data,
+                params=params,
+                headers=headers
+            )
+            
+            response.raise_for_status()
+            return response.json()
+    except httpx.RequestError as e:
+        traceback.print_exc()
+        raise TPayAPIError(f"Async API request failed: {str(e)}")
+    except httpx.HTTPStatusError as e:
+        traceback.print_exc()
+        raise TPayAPIError(f"Async API request failed: {str(e)}", 
+                          status_code=e.response.status_code,
+                          response=e.response.json() if e.response.headers.get('content-type', '').startswith('application/json') else None)
+
+async def async_create_agent(
+    name: str,
+    description: str,
+    project_id: Optional[str] = None,
+    agent_daily_limit: float = 100.0,
+    agent_type: str = "autonomous_agent"
+) -> Optional[Dict[str, Any]]:
+    """
+    Async version: Create a new agent using API key and secret authentication
+    
+    Args:
+        name: Agent name
+        description: Agent description
+        project_id: Project ID (optional, will use config default if not provided)
+        agent_daily_limit: Daily spending limit for the agent (default: 100.0)
+        agent_type: Type of agent (default: "autonomous_agent")
+        
+    Returns:
+        Dictionary containing agent information, or None if creation fails
+    """
+    # Get project_id from config if not provided
+    if project_id is None:
+        config = get_config()
+        project_id = config.get("project_id")
+        if not project_id:
+            logger.error("Project ID not provided and not found in configuration")
+            return None
+    
+    logger.info(f"Creating agent: {name}")
+    
+    payload = {
+        "name": name,
+        "project_id": project_id,
+        "description": description,
+        "agent_daily_limit": agent_daily_limit,
+        "agent_type": agent_type
+    }
+    
+    try:
+        # Use the async_make_request function which handles API key/secret authentication
+        agent_data = await async_make_request("POST", "/agent_profiles", data=payload)
+        logger.info(f"Agent creation successful: {agent_data.get('id', 'Unknown ID')}")
+        return agent_data
+    except Exception as e:
+        logger.error(f"Agent creation failed: {str(e)}")
+        return None
+
+async def async_get_agent_asset_balance(
+    agent_id: str,
+    network: str,
+    asset: str
+) -> Optional[float]:
+    """
+    Async version: Get the balance for a specific asset on a specific network for an agent
+    
+    Args:
+        agent_id: ID of the agent
+        network: Network (e.g., solana, xrpl)
+        asset: Asset type (e.g., USDC, XRP, SOL)
+        
+    Returns:
+        Float balance value, or None if retrieval fails
+    """
+    logger.info(f"Getting {asset} balance on {network} for agent {agent_id}")
+    
+    endpoint = f"/balance/agent/{agent_id}/{network}/{asset}"
+    
+    try:
+        # Use the async_make_request function which handles API key/secret authentication
+        balance_data = await async_make_request("GET", endpoint)
+        balance_data["balance"] = float(balance_data["balance"])
+        return balance_data["balance"]
+    except Exception as e:
+        logger.error(f"Asset balance retrieval failed: {str(e)}")
         return None

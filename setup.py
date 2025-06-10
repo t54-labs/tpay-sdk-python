@@ -8,6 +8,10 @@ setup(
         "requests>=2.25.1",
         "python-dotenv>=0.19.0",
     ],
+    extras_require={
+        "async": ["httpx>=0.24.0"],
+        "all": ["httpx>=0.24.0"],
+    },
     author="t54 labs",
     author_email="support@t54.ai",
     description="tPay SDK for Python",

@@ -188,6 +188,26 @@ class TPayAgent:
         from .core import make_request
         return make_request("GET", f"/balance/agent/{agent_id}")
     
+    def get_agent_asset_balance(
+        self,
+        agent_id: str,
+        network: str,
+        asset: str
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Get the balance for a specific asset on a specific network for an agent
+        
+        Args:
+            agent_id: ID of the agent
+            network: Network (e.g., solana, xrpl)
+            asset: Asset type (e.g., USDC, XRP, SOL)
+            
+        Returns:
+            Dictionary containing asset balance information, or None if retrieval fails
+        """
+        from .core import get_agent_asset_balance
+        return get_agent_asset_balance(agent_id, network, asset)
+    
     def wait_for_payment_success(
         self,
         payment_id: str,
@@ -275,3 +295,182 @@ class TPayAgent:
         except Exception as e:
             logger.error(f"Agent creation failed: {str(e)}")
             return None
+
+# ===============================================
+# ASYNC VERSION
+# ===============================================
+
+class AsyncTPayAgent:
+    """
+    Async TPay Agent for payment processing and tracking
+    """
+    
+    def __init__(self):
+        """
+        Initialize Async TPay Agent
+        """
+        pass
+    
+    async def create_payment(
+        self,
+        agent_id: str,
+        receiving_agent_id: str,
+        amount: float,
+        currency: str = "USDT",
+        settlement_network: str = "solana",
+        trace_context: Optional[Dict[str, Any]] = None,
+        func_stack_hashes: Optional[str] = None,
+        debug_mode: bool = False
+    ) -> Dict[str, Any]:
+        """
+        Async version: Create a payment
+        
+        Args:
+            agent_id: ID of the agent
+            receiving_agent_id: ID of the receiving agent
+            amount: Payment amount
+            currency: Payment currency (default: USDT)
+            settlement_network: Settlement network (default: solana)
+            trace_context: Trace context for tracking
+            func_stack_hashes: JSON string containing function hashes
+            debug_mode: Debug mode for testing
+        Returns:
+            Payment information
+        """
+        from .core import async_make_request
+        
+        logger.debug("Creating payment request")
+
+        # If trace_context is not provided, try to get it from the current context
+        if trace_context is None:
+            trace_context = trace_store.get_all()
+        
+        try:
+            # Convert trace_context to JSON string using the utility function
+            trace_context_str = serialize_to_json(trace_context) if trace_context else "{}"
+            # func_stack_hashes is already a string, no need to serialize
+            func_stack_hashes_str = func_stack_hashes if func_stack_hashes else "[]"
+
+            # Create PaymentRequest object
+            payment_request = PaymentRequest(
+                sending_agent_id=agent_id,
+                receiving_agent_id=receiving_agent_id,
+                payment_amount=amount,
+                currency=currency,
+                settlement_network=settlement_network,
+                trace_context=trace_context_str,
+                func_stack_hashes=func_stack_hashes_str,
+                debug_mode=debug_mode
+            )
+        except Exception as e:
+            traceback.print_exc()
+            raise TPayError(f"Error creating payment request: {e}")
+        
+        # Send request using the PaymentRequest model
+        return await async_make_request("POST", "/payment", data=payment_request.model_dump())
+    
+    async def get_payment_status(self, payment_id: str) -> Dict[str, Any]:
+        """
+        Async version: Get payment status
+        
+        Args:
+            payment_id: Payment ID
+            
+        Returns:
+            Payment status information
+        """
+        from .core import async_make_request
+        return await async_make_request("GET", f"/payment/{payment_id}")
+    
+    async def get_agent_balance(self, agent_id: str) -> Dict[str, Any]:
+        """
+        Async version: Get agent balance
+        
+        Args:
+            agent_id: ID of the agent
+            
+        Returns:
+            Agent balance information
+        """
+        from .core import async_make_request
+        return await async_make_request("GET", f"/balance/agent/{agent_id}")
+    
+    async def get_agent_asset_balance(
+        self,
+        agent_id: str,
+        network: str,
+        asset: str
+    ) -> Optional[float]:
+        """
+        Async version: Get the balance for a specific asset on a specific network for an agent
+        
+        Args:
+            agent_id: ID of the agent
+            network: Network (e.g., solana, xrpl)
+            asset: Asset type (e.g., USDC, XRP, SOL)
+            
+        Returns:
+            Float balance value, or None if retrieval fails
+        """
+        from .core import async_get_agent_asset_balance
+        return await async_get_agent_asset_balance(agent_id, network, asset)
+    
+    async def wait_for_payment_success(
+        self,
+        payment_id: str,
+        timeout: int = 60,
+        check_interval: int = 2
+    ) -> Dict[str, Any]:
+        """
+        Async version: Wait for payment to succeed
+        
+        Args:
+            payment_id: Payment ID
+            timeout: Maximum time to wait in seconds
+            check_interval: Time between status checks in seconds
+            
+        Returns:
+            Final payment status
+            
+        Raises:
+            TPayTimeoutError: If payment does not succeed within timeout
+        """
+        import asyncio
+        start_time = time.time()
+        while True:
+            status = await self.get_payment_status(payment_id)
+            if status["status"] == "success":
+                return status
+            elif status["status"] in ["failed", "cancelled"]:
+                return False
+                
+            if time.time() - start_time > timeout:
+                raise TPayTimeoutError(
+                    f"Payment {payment_id} did not succeed within {timeout} seconds"
+                )
+                
+            await asyncio.sleep(check_interval)
+    
+    async def create_agent(
+        self,
+        name: str,
+        description: str,
+        project_id: Optional[str] = None,
+        agent_daily_limit: float = 100.0,
+        agent_type: str = "autonomous_agent"
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Async version: Create a new agent using API key and secret authentication
+        
+        Args:
+            name: Agent name
+            description: Agent description
+            project_id: Project ID (optional, will use config default if not provided)
+            agent_daily_limit: Daily spending limit for the agent (default: 100.0)
+            agent_type: Type of agent (default: "autonomous_agent")
+            
+        Returns:
+            Dictionary containing agent information, or None if creation fails
+        """
+        from .core import async_create_agent
+        return await async_create_agent(name, description, project_id, agent_daily_limit, agent_type)

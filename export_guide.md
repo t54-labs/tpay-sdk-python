@@ -48,7 +48,11 @@ setup.py                       # For repackaging if needed (optional)
 
 ### Manually Install Dependencies in Target Project:
 ```bash
+# Basic dependencies
 pip install requests>=2.25.1 python-dotenv>=0.19.0
+
+# For async functionality (optional)
+pip install httpx>=0.24.0
 ```
 
 ## Usage
@@ -119,9 +123,107 @@ payment_result = agent.create_payment(
 
 # Check balance
 balance = agent.get_agent_balance("your_agent_id")
+
+# Get specific asset balance
+asset_balance = agent.get_agent_asset_balance(
+    agent_id="your_agent_id",
+    network="solana",
+    asset="USDC"
+)
 ```
 
-### 4. Use Audit Functionality
+### 4. Get Agent Asset Balance
+```python
+import tpay
+
+# Initialize SDK
+tpay.tpay_initialize(
+    api_key="your_api_key",
+    api_secret="your_api_secret",
+    project_id="your_project_id"
+)
+
+# Method 1: Using standalone function
+balance_data = tpay.get_agent_asset_balance(
+    agent_id="agent_123",
+    network="solana",
+    asset="USDC"
+)
+
+# Method 2: Using TPayAgent class
+agent = tpay.TPayAgent()
+balance_data = agent.get_agent_asset_balance(
+    agent_id="agent_123",
+    network="xrpl",
+    asset="XRP"
+)
+
+if balance_data:
+    print(f"Balance: {balance_data['balance']} {balance_data['asset']}")
+    print(f"USD Value: ${balance_data['balance_usd']}")
+```
+
+### 5. Async Functionality (Advanced)
+
+**Installation with async support:**
+```bash
+pip install tpay-0.1.1.tar.gz[async]
+# or
+pip install tpay-0.1.1.tar.gz[all]
+```
+
+**Basic async usage:**
+```python
+import asyncio
+import tpay
+
+async def main():
+    # Initialize SDK (same as sync)
+    tpay.tpay_initialize(
+        api_key="your_api_key",
+        api_secret="your_api_secret",
+        project_id="your_project_id"
+    )
+    
+    # Method 1: Using async standalone functions
+    agent_data = await tpay.async_create_agent(
+        name="Async Agent",
+        description="Created asynchronously"
+    )
+    
+    balance = await tpay.async_get_agent_asset_balance(
+        agent_id="agent_id",
+        network="solana",
+        asset="USDC"
+    )
+    
+    # Method 2: Using AsyncTPayAgent class
+    async_agent = tpay.AsyncTPayAgent()
+    
+    payment = await async_agent.create_payment(
+        agent_id="sender_id",
+        receiving_agent_id="receiver_id",
+        amount=100.0
+    )
+    
+    # Concurrent operations
+    results = await asyncio.gather(
+        tpay.async_create_agent("Agent 1", "Desc 1"),
+        tpay.async_create_agent("Agent 2", "Desc 2"),
+        tpay.async_get_agent_asset_balance("id", "solana", "USDC")
+    )
+
+# Run async code
+asyncio.run(main())
+```
+
+**Available async functions:**
+- `async_make_request()` - Core async HTTP requests
+- `async_create_agent()` - Create agent asynchronously
+- `async_get_agent_asset_balance()` - Get balance asynchronously
+- `AsyncTPayAgent` class with all async methods
+
+### 6. Use Audit Functionality
 ```python
 @tpay.taudit_verifier
 def my_audited_function():
@@ -146,6 +248,7 @@ def my_audited_function():
 Refer to the `examples/` folder for complete usage examples, including:
 - `test_agent.py`: Complete agent usage example
 - `create_agent_example.py`: Agent creation example
+- `async_example.py`: Async functionality demonstration
 
 Examples include:
 - SDK initialization
@@ -154,17 +257,30 @@ Examples include:
 - Conversation management
 - Audit submission
 - Agent creation
+- Async operations and concurrent execution
 
 ## Supported Features
 
+### Synchronous API
 ✅ Payment processing (`tpay_toolkit_payment`)
 ✅ Balance inquiry (`tpay_toolkit_balance`) 
+✅ Asset-specific balance inquiry (`get_agent_asset_balance`)
+✅ Agent creation (`create_agent`)
+✅ Agent conversation management (`TPayAgent`)
 ✅ Function tracing (`@tradar_verifier`)
 ✅ Code auditing (`@taudit_verifier`)
-✅ Agent conversation management (`TPayAgent`)
-✅ Agent creation (`create_agent`)
 ✅ Context management and tracing
 ✅ Error handling and logging
+
+### Asynchronous API (New!)
+✅ Async HTTP requests (`async_make_request`)
+✅ Async agent creation (`async_create_agent`)
+✅ Async balance inquiry (`async_get_agent_asset_balance`)
+✅ Async agent management (`AsyncTPayAgent`)
+✅ Async payment processing
+✅ Async payment status checking
+✅ Concurrent operation support
+✅ Compatible with asyncio ecosystem
 
 Build time: $(Get-Date)
 SDK version: 0.1.1 
