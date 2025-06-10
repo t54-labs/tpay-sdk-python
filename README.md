@@ -8,6 +8,8 @@ At t54 labs, we believe in creating more than just a payment system – we're bu
 
 The tPay Python SDK is your elegant gateway to this world of possibilities. Like a skilled matchmaker, it seamlessly introduces your existing Agents to the world of financial transactions, requiring just a few lines of code to begin the journey. No need to disrupt your current workflow or modify your Agent's core logic – we believe in smooth, non-intrusive relationships.
 
+Built for the modern AI ecosystem, our SDK supports both synchronous and asynchronous operations, ensuring optimal performance whether you're building a single agent or orchestrating a fleet of thousands. With our async-first architecture, your agents can handle financial operations with unprecedented efficiency and scale.
+
 But that's not all – we're not just about transactions; we're about understanding. Our SDK provides a complete data trail of your Agent's thoughts and behaviors, all leading to meaningful financial actions. Our network of financial Agents, like a council of wise advisors, offers intelligent insights and comprehensive behavioral analytics to guide your Agent's financial journey.
 
 Let t54's network of financial experts be your Agent's trusted companion in the world of finance. Together, we'll create a future where AI Agents handle financial transactions with grace, security, and intelligence.
@@ -40,13 +42,21 @@ Let t54's network of financial experts be your Agent's trusted companion in the 
 
 ### Advanced Features
 
-1. **Audit Module (tAudit)**
+1. **Asynchronous API Support** ⚡
+   - Full async/await support for all operations
+   - High-performance concurrent execution
+   - Non-blocking I/O operations
+   - Compatible with asyncio ecosystem
+   - Parallel agent creation and management
+   - Concurrent balance queries and payments
+
+2. **Audit Module (tAudit)**
    - Enhance Agent KYA (Know Your Agent) level
    - Improve security and protection for financial transactions
    - Automated compliance verification
    - Risk assessment and monitoring
 
-2. **Compliance and Security (tRadar)**
+3. **Compliance and Security (tRadar)**
    - Complete Agent behavior and decision-making data trail
    - End-to-end transaction lifecycle tracking
    - Validator Agent Network collaboration
@@ -54,7 +64,7 @@ Let t54's network of financial experts be your Agent's trusted companion in the 
    - Developer analytics and insights
    - Agent optimization and debugging support
 
-3. **Error Handling**
+4. **Error Handling**
    - Comprehensive error management
    - Detailed error messages
    - Error recovery mechanisms
@@ -62,7 +72,11 @@ Let t54's network of financial experts be your Agent's trusted companion in the 
 ## Installation
 
 ```bash
+# Basic installation
 pip install tpay
+
+# With async support (recommended for high-performance applications)
+pip install tpay[async]
 ```
 
 ## Requirements
@@ -73,10 +87,15 @@ pip install tpay
 
 ### Dependencies
 The SDK has the following main dependencies:
-- `requests>=2.31.0`: For HTTP requests
-- `pydantic>=2.5.0`: For data validation and settings management
-- `python-dotenv>=1.0.0`: For environment variable management
-- `openai>=1.0.0`: For OpenAI API integration (optional, only if using OpenAI features)
+- `requests>=2.25.1`: For synchronous HTTP requests
+- `python-dotenv>=0.19.0`: For environment variable management
+- `pydantic>=2.0.0`: For data validation and settings management (optional)
+
+**For Async Support (optional):**
+- `httpx>=0.24.0`: For asynchronous HTTP requests
+
+**For OpenAI Integration (optional):**
+- `openai>=1.0.0`: For OpenAI API integration
 
 Additional dependencies will be automatically installed when you install the SDK.
 
@@ -151,6 +170,41 @@ def execute_tool(tool_name, tool_args):
 
 That's it! Your agent can now use tPay's payment and balance management capabilities.
 
+### Asynchronous Usage (Advanced)
+
+For high-performance applications, you can use the asynchronous API:
+
+```python
+import asyncio
+import tpay
+
+async def main():
+    # Initialize SDK (same as sync)
+    tpay.tpay_initialize(
+        api_key="your_api_key",
+        api_secret="your_api_secret",
+        project_id="your_project_id"
+    )
+    
+    # Create agents asynchronously
+    agent_data = await tpay.async_create_agent(
+        name="Async Agent",
+        description="High-performance agent"
+    )
+    
+    # Use AsyncTPayAgent for non-blocking operations
+    async_agent = tpay.AsyncTPayAgent()
+    
+    # Concurrent operations for better performance
+    results = await asyncio.gather(
+        async_agent.create_payment(...),
+        async_agent.get_agent_balance("agent_id"),
+        tpay.async_get_agent_asset_balance("agent_id", "solana", "USDC")
+    )
+
+# Run async code
+asyncio.run(main())
+```
 
 ### Error Handling
 
@@ -188,6 +242,34 @@ except TPayError as e:
    - Validate all inputs
    - Implement rate limiting
    - Use secure communication channels
+
+## Complete Documentation
+
+For comprehensive documentation including deployment guides, async examples, and advanced usage patterns, please refer to:
+
+📖 **[Complete Export Guide](/docs/export_guide.md)** - Detailed documentation covering:
+- Installation and deployment methods
+- Synchronous and asynchronous API usage
+- Complete code examples
+- Best practices and troubleshooting
+- Agent creation and management
+- Balance queries and payment processing
+
+## API Reference
+
+### Synchronous API
+- `tpay_initialize()` - Initialize the SDK
+- `create_agent()` - Create new agents
+- `get_agent_asset_balance()` - Query asset balances
+- `TPayAgent` class - Full agent management
+
+### Asynchronous API
+- `async_create_agent()` - Create agents asynchronously
+- `async_get_agent_asset_balance()` - Query balances asynchronously  
+- `AsyncTPayAgent` class - Full async agent management
+- `async_make_request()` - Core async HTTP requests
+
+For detailed API documentation and examples, see the [Export Guide](/docs/export_guide.md).
 
 ## Contributing
 
